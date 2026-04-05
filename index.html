@@ -581,8 +581,8 @@ body {
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwfu41ryDe0Ft3zZcuUPuaa19GcAbDVEFiRnFDWrNY-mExL6KcIkzrJngNUEbPVuy0-/exec';
 
 // ===== 状態 =====
-let allMembers = [];
-let selectedName = '';
+let allMembers = []; // [{ id, name }, ...]
+let selectedMember = null; // { id, name }
 let lastRecord = null;
 let summaryYear, summaryMonthNum;
 
@@ -681,25 +681,25 @@ function renderNameGrid() {
   const row = KANA_ROWS.find(r => r.label === activeKana);
   if (!row) return;
 
-  const filtered = allMembers.filter(name => row.pattern.test(name));
+  const filtered = allMembers.filter(m => row.pattern.test(m.name));
 
   if (filtered.length === 0) {
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-light);padding:24px;font-size:13px;letter-spacing:.05em;">該当する名前がありません</div>';
     return;
   }
 
-  filtered.forEach(name => {
+  filtered.forEach(m => {
     const btn = document.createElement('button');
     btn.className = 'name-btn';
-    btn.textContent = name;
-    btn.addEventListener('click', () => selectName(name));
+    btn.textContent = m.name;
+    btn.addEventListener('click', () => selectName(m));
     grid.appendChild(btn);
   });
 }
 
-function selectName(name) {
-  selectedName = name;
-  $('selectedName').textContent = name;
+function selectName(member) {
+  selectedMember = member;
+  $('selectedName').textContent = member.name;
   renderAmountGrid();
   showScreen('screen-amount');
 }
@@ -720,23 +720,23 @@ function renderAmountGrid() {
 async function recordAmount(amount) {
   const ok = await showModal(
     '記録の確認',
-    `<strong>${selectedName}</strong> さん<br><strong>${amount}円</strong> を記録します`,
+    `<strong>${selectedMember.name}</strong> さん<br><strong>${amount}円</strong> を記録します`,
     '記録する',
     false
   );
   if (!ok) return;
 
-  const res = await api('POST', { action: 'record', name: selectedName, amount: amount });
+  const res = await api('POST', { action: 'record', name: selectedMember.name, amount: amount, memberId: selectedMember.id });
 
   if (res.error) {
     showToast('記録に失敗しました');
     return;
   }
 
-  lastRecord = { name: selectedName, amount: amount };
+  lastRecord = { name: selectedMember.name, amount: amount };
   $('doneIcon').textContent = '\u2713';
   $('doneMsg').textContent = 'Thank you';
-  $('doneDetail').textContent = selectedName + '\u3000' + amount + '円';
+  $('doneDetail').textContent = selectedMember.name + '\u3000' + amount + '円';
   $('btnUndo').style.display = '';
   showScreen('screen-done');
 }
@@ -850,7 +850,7 @@ async function init() {
     showToast('メンバー読み込みに失敗しました');
     return;
   }
-  allMembers = res.members || [];
+  allMembers = (res.members || []).map(m => typeof m === 'string' ? { id: '', name: m } : m);
   renderNameGrid();
 }
 
