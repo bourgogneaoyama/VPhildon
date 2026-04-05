@@ -38,7 +38,7 @@ body {
 /* ヘッダー */
 .header {
   background: var(--card);
-  padding: 20px 20px 16px;
+  padding: 14px 20px 10px;
   text-align: center;
   position: sticky;
   top: 0;
@@ -78,7 +78,7 @@ body {
   background: var(--card);
   border-bottom: 1px solid var(--border);
   position: sticky;
-  top: 73px;
+  top: 65px;
   z-index: 99;
 }
 .nav button {
@@ -114,7 +114,7 @@ body {
 }
 
 /* 画面共通 */
-.screen { display: none; padding: 24px 20px; max-width: 480px; margin: 0 auto; }
+.screen { display: none; padding: 16px 12px; max-width: 480px; margin: 0 auto; }
 .screen.active { display: block; }
 
 /* セクションラベル */
@@ -124,28 +124,26 @@ body {
   letter-spacing: .2em;
   color: var(--text-light);
   text-align: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   text-transform: uppercase;
 }
 
 /* あいうえおタブ */
 .kana-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  justify-content: center;
-  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
 }
 .kana-tabs button {
   border: 1px solid var(--border);
   background: var(--card);
   color: var(--text-secondary);
   font-family: 'Noto Sans JP', sans-serif;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 400;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  height: 48px;
+  border-radius: var(--radius);
   cursor: pointer;
   transition: all .25s;
 }
@@ -162,7 +160,7 @@ body {
 /* 名前グリッド */
 .name-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
 }
 .name-btn {
@@ -170,15 +168,19 @@ body {
   background: var(--card);
   color: var(--text);
   font-family: 'Noto Sans JP', sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
-  padding: 16px 8px;
+  padding: 20px 8px;
   border-radius: var(--radius);
   cursor: pointer;
   box-shadow: var(--shadow);
   transition: all .2s;
   text-align: center;
   word-break: keep-all;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .name-btn:hover {
   border-color: var(--primary-light);
@@ -210,25 +212,25 @@ body {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
-  max-width: 300px;
-  margin: 0 auto 28px;
+  margin: 0 auto 24px;
 }
 .amount-btn {
   border: 1px solid var(--border);
   background: var(--card);
   color: var(--text);
   font-family: 'Cormorant Garamond', serif;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 500;
-  padding: 16px 8px;
+  padding: 20px 8px;
   border-radius: var(--radius);
   cursor: pointer;
   transition: all .2s;
   box-shadow: var(--shadow);
+  min-height: 60px;
 }
 .amount-btn span {
   font-family: 'Noto Sans JP', sans-serif;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 300;
   color: var(--text-secondary);
 }
@@ -489,7 +491,7 @@ body {
   width: 32px;
   height: 1px;
   background: var(--border);
-  margin: 0 auto 20px;
+  margin: 0 auto 12px;
 }
 </style>
 </head>
