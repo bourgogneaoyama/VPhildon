@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>ヴァンパッシオン商店 | 水代記録</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #8b7355;
+  --primary-light: #a89279;
+  --primary-pale: #f0ebe4;
+  --accent: #c4956a;
+  --danger: #c17c74;
+  --bg: #faf8f5;
+  --card: #ffffff;
+  --text: #3c3632;
+  --text-secondary: #8a8078;
+  --text-light: #b5ada6;
+  --border: #e8e2db;
+  --border-light: #f0ebe4;
+  --radius: 8px;
+  --shadow: 0 1px 4px rgba(60,54,50,.06);
+  --shadow-hover: 0 4px 16px rgba(60,54,50,.1);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: 'Noto Sans JP', 'Hiragino Sans', -apple-system, sans-serif;
+  font-weight: 300;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  letter-spacing: .03em;
+}
+
+/* ヘッダー */
+.header {
+  background: var(--card);
+  padding: 20px 20px 16px;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid var(--border);
+}
+.header-brand {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .35em;
+  color: var(--primary);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.header h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--text);
+  letter-spacing: .08em;
+}
+.header-shop {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  letter-spacing: .1em;
+  margin-bottom: 2px;
+}
+
+/* ナビ */
+.nav {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 73px;
+  z-index: 99;
+}
+.nav button {
+  border: none;
+  background: none;
+  color: var(--text-light);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: .12em;
+  padding: 12px 28px;
+  cursor: pointer;
+  transition: all .3s;
+  position: relative;
+}
+.nav button::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 1.5px;
+  background: var(--primary);
+  transition: width .3s;
+}
+.nav button.active {
+  color: var(--primary);
+  font-weight: 500;
+}
+.nav button.active::after {
+  width: 24px;
+}
+
+/* 画面共通 */
+.screen { display: none; padding: 24px 20px; max-width: 480px; margin: 0 auto; }
+.screen.active { display: block; }
+
+/* セクションラベル */
+.section-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .2em;
+  color: var(--text-light);
+  text-align: center;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+}
+
+/* あいうえおタブ */
+.kana-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.kana-tabs button {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text-secondary);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all .25s;
+}
+.kana-tabs button:hover {
+  border-color: var(--primary-light);
+  color: var(--primary);
+}
+.kana-tabs button.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* 名前グリッド */
+.name-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 10px;
+}
+.name-btn {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  padding: 16px 8px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all .2s;
+  text-align: center;
+  word-break: keep-all;
+}
+.name-btn:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-hover);
+}
+.name-btn:active {
+  transform: scale(.97);
+  background: var(--primary-pale);
+  border-color: var(--primary);
+}
+
+
+/* 金額選択 */
+.amount-screen { text-align: center; }
+.amount-label {
+  font-size: 11px;
+  letter-spacing: .15em;
+  color: var(--text-light);
+}
+.selected-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 400;
+  color: var(--text);
+  margin: 8px 0 28px;
+  letter-spacing: .05em;
+}
+.amount-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  max-width: 300px;
+  margin: 0 auto 28px;
+}
+.amount-btn {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 500;
+  padding: 16px 8px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all .2s;
+  box-shadow: var(--shadow);
+}
+.amount-btn span {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 10px;
+  font-weight: 300;
+  color: var(--text-secondary);
+}
+.amount-btn:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-hover);
+}
+.amount-btn:active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.amount-btn:active span { color: rgba(255,255,255,.7); }
+.back-link {
+  border: none;
+  background: none;
+  color: var(--text-light);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: .08em;
+  cursor: pointer;
+  padding: 8px 16px;
+  transition: color .2s;
+}
+.back-link:hover { color: var(--primary); }
+
+/* 確認モーダル */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(60,54,50,.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 32px 28px 24px;
+  width: 88%;
+  max-width: 320px;
+  text-align: center;
+  box-shadow: 0 12px 40px rgba(60,54,50,.15);
+}
+.modal h2 {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 12px;
+  letter-spacing: .05em;
+}
+.modal p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  line-height: 1.8;
+}
+.modal-actions {
+  display: flex;
+  gap: 10px;
+}
+.modal-actions button {
+  flex: 1;
+  border: none;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  padding: 11px;
+  border-radius: 6px;
+  cursor: pointer;
+  letter-spacing: .05em;
+  transition: all .2s;
+}
+.btn-cancel-modal {
+  background: var(--border-light);
+  color: var(--text-secondary);
+}
+.btn-confirm {
+  background: var(--primary);
+  color: #fff;
+}
+.btn-confirm.danger {
+  background: var(--danger);
+}
+
+/* 完了画面 */
+.done-screen { text-align: center; padding-top: 48px; }
+.done-icon { font-size: 48px; margin-bottom: 20px; opacity: .85; }
+.done-msg {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 400;
+  margin-bottom: 8px;
+  letter-spacing: .05em;
+}
+.done-detail {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 36px;
+  letter-spacing: .05em;
+}
+.done-actions { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+.btn-primary {
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: #fff;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  padding: 12px 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  min-width: 200px;
+  letter-spacing: .08em;
+  transition: all .2s;
+}
+.btn-primary:hover { background: var(--primary-light); border-color: var(--primary-light); }
+.btn-outline {
+  border: 1px solid var(--danger);
+  background: none;
+  color: var(--danger);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  padding: 10px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  min-width: 200px;
+  letter-spacing: .08em;
+  transition: all .2s;
+}
+.btn-outline:hover { background: rgba(193,124,116,.06); }
+
+/* 集計画面 */
+.summary-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.summary-header button {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text-secondary);
+  font-size: 14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .2s;
+}
+.summary-header button:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.summary-month {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 400;
+  min-width: 140px;
+  text-align: center;
+  letter-spacing: .05em;
+}
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+.summary-table th {
+  background: var(--primary-pale);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--primary);
+  padding: 10px 16px;
+  text-align: left;
+  letter-spacing: .12em;
+}
+.summary-table th:last-child { text-align: right; }
+.summary-table td {
+  padding: 14px 16px;
+  font-size: 14px;
+  border-top: 1px solid var(--border-light);
+  font-weight: 300;
+}
+.summary-table td:last-child {
+  text-align: right;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  font-weight: 500;
+}
+.summary-total {
+  text-align: right;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-weight: 500;
+  margin-top: 16px;
+  padding-right: 4px;
+  color: var(--primary);
+}
+
+/* ローディング */
+.loading {
+  text-align: center;
+  padding: 48px;
+  color: var(--text-light);
+  font-size: 12px;
+  letter-spacing: .1em;
+}
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+  margin: 0 auto 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* トースト */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--text);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 300;
+  z-index: 300;
+  opacity: 0;
+  transition: all .3s;
+  white-space: nowrap;
+  letter-spacing: .03em;
+}
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* 区切り線 */
+.divider {
+  width: 32px;
+  height: 1px;
+  background: var(--border);
+  margin: 0 auto 20px;
+}
+</style>
+</head>
+<body>
+
+<!-- ヘッダー -->
+<div class="header">
+  <div class="header-brand">Vin Passion</div>
+  <div class="header-shop">ヴァンパッシオン商店</div>
+  <h1>ヒルドン社販コーナー</h1>
+</div>
+
+<!-- ナビ -->
+<div class="nav">
+  <button class="active" data-screen="select">記録する</button>
+  <button data-screen="summary">月次集計</button>
+</div>
+
+<!-- ① 名前選択画面 -->
+<div id="screen-select" class="screen active">
+  <div class="section-label">Select your name</div>
+  <div class="divider"></div>
+  <div class="kana-tabs" id="kanaTabs"></div>
+  <div class="name-grid" id="nameGrid"></div>
+  <div class="loading" id="loadingMembers">
+    <div class="spinner"></div>
+    <div>読み込み中...</div>
+  </div>
+</div>
+
+<!-- ② 金額選択画面 -->
+<div id="screen-amount" class="screen amount-screen">
+  <div class="amount-label">RECORDING FOR</div>
+  <div class="selected-name" id="selectedName"></div>
+  <div class="divider"></div>
+  <div class="section-label">Select amount</div>
+  <div class="amount-grid" id="amountGrid"></div>
+  <button class="back-link" id="backToSelect">&#8592; 名前選択に戻る</button>
+</div>
+
+<!-- ③ 完了画面 -->
+<div id="screen-done" class="screen done-screen">
+  <div class="done-icon" id="doneIcon"></div>
+  <div class="done-msg" id="doneMsg"></div>
+  <div class="done-detail" id="doneDetail"></div>
+  <div class="done-actions">
+    <button class="btn-primary" id="btnBackTop">トップに戻る</button>
+    <button class="btn-outline" id="btnUndo">この記録を取り消す</button>
+  </div>
+</div>
+
+<!-- ④ 集計画面 -->
+<div id="screen-summary" class="screen">
+  <div class="section-label">Monthly Report</div>
+  <div class="divider"></div>
+  <div class="summary-header">
+    <button id="prevMonth">&#9664;</button>
+    <div class="summary-month" id="summaryMonth"></div>
+    <button id="nextMonth">&#9654;</button>
+  </div>
+  <table class="summary-table" id="summaryTable">
+    <thead><tr><th>NAME</th><th>TOTAL</th></tr></thead>
+    <tbody id="summaryBody"></tbody>
+  </table>
+  <div class="summary-total" id="summaryTotal"></div>
+  <div class="loading" id="loadingSummary" style="display:none;">
+    <div class="spinner"></div>
+    <div>読み込み中...</div>
+  </div>
+</div>
+
+<!-- 確認モーダル -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2 id="modalTitle"></h2>
+    <p id="modalBody"></p>
+    <div class="modal-actions">
+      <button class="btn-cancel-modal" id="modalCancel">やめる</button>
+      <button class="btn-confirm" id="modalConfirm">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- トースト -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== 設定 =====
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwfu41ryDe0Ft3zZcuUPuaa19GcAbDVEFiRnFDWrNY-mExL6KcIkzrJngNUEbPVuy0-/exec';
+
+// ===== 状態 =====
+let allMembers = [];
+let selectedName = '';
+let lastRecord = null;
+let summaryYear, summaryMonthNum;
+
+// ===== あいうえお行定義 =====
+const KANA_ROWS = [
+  { label: 'あ', pattern: /^[あいうえおアイウエオ]/ },
+  { label: 'か', pattern: /^[かきくけこがぎぐげごカキクケコガギグゲゴ]/ },
+  { label: 'さ', pattern: /^[さしすせそざじずぜぞサシスセソザジズゼゾ]/ },
+  { label: 'た', pattern: /^[たちつてとだぢづでどタチツテトダヂヅデド]/ },
+  { label: 'な', pattern: /^[なにぬねのナニヌネノ]/ },
+  { label: 'は', pattern: /^[はひふへほばびぶべぼぱぴぷぺぽハヒフヘホバビブベボパピプペポ]/ },
+  { label: 'ま', pattern: /^[まみむめもマミムメモ]/ },
+  { label: 'や', pattern: /^[やゆよヤユヨ]/ },
+  { label: 'ら', pattern: /^[らりるれろラリルレロ]/ },
+  { label: 'わ', pattern: /^[わをんワヲン]/ },
+];
+let activeKana = 'あ';
+
+// ===== ユーティリティ =====
+function $(id) { return document.getElementById(id); }
+
+function showToast(msg) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function showModal(title, body, confirmText, isDanger) {
+  return new Promise(resolve => {
+    $('modalTitle').textContent = title;
+    $('modalBody').innerHTML = body;
+    $('modalConfirm').textContent = confirmText || 'OK';
+    $('modalConfirm').className = isDanger ? 'btn-confirm danger' : 'btn-confirm';
+    $('modalOverlay').classList.add('show');
+    const onConfirm = () => { cleanup(); resolve(true); };
+    const onCancel = () => { cleanup(); resolve(false); };
+    function cleanup() {
+      $('modalOverlay').classList.remove('show');
+      $('modalConfirm').removeEventListener('click', onConfirm);
+      $('modalCancel').removeEventListener('click', onCancel);
+    }
+    $('modalConfirm').addEventListener('click', onConfirm);
+    $('modalCancel').addEventListener('click', onCancel);
+  });
+}
+
+async function api(method, params) {
+  try {
+    if (method === 'GET') {
+      const qs = new URLSearchParams(params).toString();
+      const res = await fetch(GAS_URL + '?' + qs, { redirect: 'follow' });
+      return await res.json();
+    } else {
+      const res = await fetch(GAS_URL, {
+        method: 'POST',
+        redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(params),
+      });
+      return await res.json();
+    }
+  } catch (e) {
+    console.error(e);
+    showToast('通信エラーが発生しました');
+    return { error: e.message };
+  }
+}
+
+// ===== 画面切替 =====
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $(id).classList.add('active');
+}
+
+// ===== ① 名前選択 =====
+function renderKanaTabs() {
+  const container = $('kanaTabs');
+  container.innerHTML = '';
+  KANA_ROWS.forEach(row => {
+    const btn = document.createElement('button');
+    btn.textContent = row.label;
+    if (row.label === activeKana) btn.classList.add('active');
+    btn.addEventListener('click', () => {
+      activeKana = row.label;
+      renderKanaTabs();
+      renderNameGrid();
+    });
+    container.appendChild(btn);
+  });
+}
+
+function renderNameGrid() {
+  const grid = $('nameGrid');
+  grid.innerHTML = '';
+  const row = KANA_ROWS.find(r => r.label === activeKana);
+  if (!row) return;
+
+  const filtered = allMembers.filter(name => row.pattern.test(name));
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-light);padding:24px;font-size:13px;letter-spacing:.05em;">該当する名前がありません</div>';
+    return;
+  }
+
+  filtered.forEach(name => {
+    const btn = document.createElement('button');
+    btn.className = 'name-btn';
+    btn.textContent = name;
+    btn.addEventListener('click', () => selectName(name));
+    grid.appendChild(btn);
+  });
+}
+
+function selectName(name) {
+  selectedName = name;
+  $('selectedName').textContent = name;
+  renderAmountGrid();
+  showScreen('screen-amount');
+}
+
+// ===== ② 金額選択 → 記録 =====
+function renderAmountGrid() {
+  const grid = $('amountGrid');
+  grid.innerHTML = '';
+  for (let i = 100; i <= 1000; i += 100) {
+    const btn = document.createElement('button');
+    btn.className = 'amount-btn';
+    btn.innerHTML = `${i} <span>yen</span>`;
+    btn.addEventListener('click', () => recordAmount(i));
+    grid.appendChild(btn);
+  }
+}
+
+async function recordAmount(amount) {
+  const ok = await showModal(
+    '記録の確認',
+    `<strong>${selectedName}</strong> さん<br><strong>${amount}円</strong> を記録します`,
+    '記録する',
+    false
+  );
+  if (!ok) return;
+
+  const res = await api('POST', { action: 'record', name: selectedName, amount: amount });
+
+  if (res.error) {
+    showToast('記録に失敗しました');
+    return;
+  }
+
+  lastRecord = { name: selectedName, amount: amount };
+  $('doneIcon').textContent = '\u2713';
+  $('doneMsg').textContent = 'Thank you';
+  $('doneDetail').textContent = selectedName + '\u3000' + amount + '円';
+  $('btnUndo').style.display = '';
+  showScreen('screen-done');
+}
+
+$('backToSelect').addEventListener('click', () => showScreen('screen-select'));
+
+// ===== ③ 完了 → 取り消し =====
+$('btnBackTop').addEventListener('click', () => {
+  lastRecord = null;
+  showScreen('screen-select');
+});
+
+$('btnUndo').addEventListener('click', async () => {
+  if (!lastRecord) return;
+  const ok = await showModal(
+    '取り消し確認',
+    `<strong>${lastRecord.name}</strong> さんの記録を取り消しますか？`,
+    '取り消す',
+    true
+  );
+  if (!ok) return;
+
+  const res = await api('POST', { action: 'cancel', name: lastRecord.name });
+  if (res.error) {
+    showToast('取り消しに失敗しました');
+    return;
+  }
+
+  $('doneIcon').textContent = '\u21a9';
+  $('doneMsg').textContent = '取り消しました';
+  $('doneDetail').textContent = `${lastRecord.name}\u3000${lastRecord.amount}円`;
+  $('btnUndo').style.display = 'none';
+  lastRecord = null;
+});
+
+// ===== ④ 集計画面 =====
+function initSummaryMonth() {
+  const now = new Date();
+  summaryYear = now.getFullYear();
+  summaryMonthNum = now.getMonth() + 1;
+}
+
+function renderSummaryMonthLabel() {
+  $('summaryMonth').textContent = `${summaryYear}年${summaryMonthNum}月`;
+}
+
+async function loadSummary() {
+  $('loadingSummary').style.display = '';
+  $('summaryTable').style.display = 'none';
+  $('summaryTotal').textContent = '';
+  const month = `${summaryYear}-${String(summaryMonthNum).padStart(2, '0')}`;
+  const res = await api('GET', { action: 'getSummary', month: month });
+  $('loadingSummary').style.display = 'none';
+  $('summaryTable').style.display = '';
+
+  const tbody = $('summaryBody');
+  tbody.innerHTML = '';
+
+  if (res.error || !res.summary || res.summary.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;color:var(--text-light);padding:24px;font-size:13px;">データがありません</td></tr>';
+    return;
+  }
+
+  let grandTotal = 0;
+  res.summary.forEach(item => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${item.name}</td><td>${item.total.toLocaleString()}円</td>`;
+    tbody.appendChild(tr);
+    grandTotal += item.total;
+  });
+  $('summaryTotal').textContent = `Total: ${grandTotal.toLocaleString()}円`;
+}
+
+$('prevMonth').addEventListener('click', () => {
+  summaryMonthNum--;
+  if (summaryMonthNum < 1) { summaryMonthNum = 12; summaryYear--; }
+  renderSummaryMonthLabel();
+  loadSummary();
+});
+
+$('nextMonth').addEventListener('click', () => {
+  summaryMonthNum++;
+  if (summaryMonthNum > 12) { summaryMonthNum = 1; summaryYear++; }
+  renderSummaryMonthLabel();
+  loadSummary();
+});
+
+// ===== ナビ =====
+document.querySelectorAll('.nav button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const screen = btn.dataset.screen;
+    if (screen === 'select') {
+      showScreen('screen-select');
+    } else if (screen === 'summary') {
+      initSummaryMonth();
+      renderSummaryMonthLabel();
+      showScreen('screen-summary');
+      loadSummary();
+    }
+  });
+});
+
+// ===== 初期化 =====
+async function init() {
+  renderKanaTabs();
+  const res = await api('GET', { action: 'getMembers' });
+  $('loadingMembers').style.display = 'none';
+  if (res.error) {
+    showToast('メンバー読み込みに失敗しました');
+    return;
+  }
+  allMembers = res.members || [];
+  renderNameGrid();
+}
+
+init();
+</script>
+</body>
+</html>
