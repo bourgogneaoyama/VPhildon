@@ -132,3 +132,98 @@ function getSummary(month) {
 
   return createJsonOutput({ month: month, summary: summary });
 }
+
+// --- 年度別集計シート自動作成 ---
+// 毎年4月1日にトリガーで実行、または手動実行可
+// createYearlySummarySheet() で当年度分を作成
+// createYearlySummarySheet(2027) で指定年度を作成
+function createYearlySummarySheet(fiscalYear) {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+
+  // 年度の判定（4月始まり）: 省略時は現在の年度
+  if (!fiscalYear) {
+    const now = new Date();
+    fiscalYear = now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear() - 1;
+  }
+
+  const sheetName = fiscalYear + '年度集計';
+
+  // 既に存在する場合はスキップ
+  if (ss.getSheetByName(sheetName)) {
+    Logger.log(sheetName + ' は既に存在します');
+    return;
+  }
+
+  // メンバー取得
+  const memSheet = ss.getSheetByName('メンバー');
+  const lastRow = memSheet.getLastRow();
+  if (lastRow < 2) return;
+  const members = memSheet.getRange(2, 1, lastRow - 1, 2).getValues().filter(function(r) { return r[1] !== ''; });
+
+  // 月リスト（4月〜翌3月）
+  var months = [];
+  for (var m = 4; m <= 12; m++) months.push({ year: fiscalYear, month: m });
+  for (var m = 1; m <= 3; m++) months.push({ year: fiscalYear + 1, month: m });
+
+  // シート作成
+  var sheet = ss.insertSheet(sheetName);
+
+  // ヘッダー
+  var header = ['社員番号', '名前'];
+  months.forEach(function(d) { header.push(d.year + '年' + d.month + '月'); });
+  header.push('年間合計');
+  sheet.getRange(1, 1, 1, header.length).setValues([header]);
+
+  // メンバー行（数式）
+  var dataRows = [];
+  members.forEach(function(mem, idx) {
+    var row = [mem[0], mem[1]];
+    var r = idx + 2;
+    months.forEach(function(d) {
+      var startDate = 'DATE(' + d.year + ',' + d.month + ',1)';
+      var lastDay = 'EOMONTH(DATE(' + d.year + ',' + d.month + ',1),0)+0.99999';
+      row.push('=SUMPRODUCT((記録!C2:C10000=B' + r + ')*(記録!A2:A10000>=' + startDate + ')*(記録!A2:A10000<=' + lastDay + ')*記録!D2:D10000)');
+    });
+    row.push('=SUM(C' + r + ':N' + r + ')');
+    dataRows.push(row);
+  });
+
+  // 合計行
+  var lastDataRow = members.length + 1;
+  var totalRow = ['', '合計'];
+  for (var i = 0; i < months.length + 1; i++) {
+    var col = String.fromCharCode(67 + i);
+    totalRow.push('=SUM(' + col + '2:' + col + lastDataRow + ')');
+  }
+  dataRows.push(totalRow);
+
+  sheet.getRange(2, 1, dataRows.length, header.length).setValues(dataRows);
+
+  // 書式調整
+  sheet.getRange(1, 1, 1, header.length).setFontWeight('bold');
+  sheet.setFrozenRows(1);
+  sheet.autoResizeColumns(1, header.length);
+
+  Logger.log(sheetName + ' を作成しました');
+}
+
+// --- 毎年4月に自動実行するためのトリガー設定 ---
+// 初回に1度だけ手動実行してください
+function setupYearlyTrigger() {
+  // 既存のトリガーを削除（重複防止）
+  var triggers = ScriptApp.getProjectTriggers();
+  triggers.forEach(function(t) {
+    if (t.getHandlerFunction() === 'createYearlySummarySheet') {
+      ScriptApp.deleteTrigger(t);
+    }
+  });
+
+  // 毎年4月1日 9:00 に実行
+  ScriptApp.newTrigger('createYearlySummarySheet')
+    .timeBased()
+    .onMonthDay(1)
+    .atHour(9)
+    .create();
+
+  Logger.log('月次トリガーを設定しました（毎月1日に実行、4月のみシート作成）');
+}
